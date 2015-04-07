@@ -12,23 +12,28 @@ import sys
 
 class GCCA:
 
-    def __init__(self, n_components=2, reg_param=0.1, calc_time=False):
+    def __init__(self, n_components=2, reg_param=0.1):
 
         # log setting
         program = os.path.basename(sys.argv[0])
         self.logger = logging.getLogger(program)
         logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s')
 
+        self.n_components = n_components
         self.reg_param = reg_param
         self.x_1 = None
         self.x_2 = None
         self.x_3 = None
-        self.weights_1 = None
-        self.eigvals_1 = None
-        self.weights_2 = None
-        self.eigvals_2 = None
-        self.weights_3 = None
-        self.eigvals_3 = None
+        self.c11 = None
+        self.c22 = None
+        self.c33 = None
+        self.c12 = None
+        self.c23 = None
+        self.c13 = None
+        self.h_1 = None
+        self.h_2 = None
+        self.h_3 = None
+        self.eigvals = None
 
     def solve_eigprob(self, left, right):
 
@@ -104,12 +109,16 @@ class GCCA:
         ])
         eigvals, eigvecs = self.solve_eigprob(left, right)
 
-        self.weights_1 = eigvecs[:d1]
-        self.eigvals_1 = eigvals[:d1]
-        self.weights_2 = eigvecs[d1:d2]
-        self.eigvals_2 = eigvals[d1:d2]
-        self.weights_3 = eigvecs[d2:]
-        self.eigvals_3 = eigvals[d2:]
+        self.h_1 = eigvecs[:d1]
+        self.h_2 = eigvecs[d1:d2]
+        self.h_3 = eigvecs[d2:]
+        self.eigvals = eigvals
+        self.c11 = c11
+        self.c22 = c22
+        self.c33 = c33
+        self.c12 = c12
+        self.c23 = c23
+        self.c13 = c13
 
     def transform(self, x_1, x_2, x_3):
 
@@ -119,15 +128,45 @@ class GCCA:
         x_3 = self.normalize(x_3)
 
         self.logger.info("transform matrices by CCA")
-        z_1 = np.dot(x_1, self.weights_1)
-        z_2 = np.dot(x_2, self.weights_2)
-        z_3 = np.dot(x_3, self.weights_3)
+        z_1 = np.dot(x_1, self.h_1)
+        z_2 = np.dot(x_2, self.h_2)
+        z_3 = np.dot(x_3, self.h_3)
 
         self.z_1 = z_1
         self.z_2 = z_2
         self.z_3 = z_3
 
         return z_1, z_2, z_3
+
+    def save_params(self, filepath):
+        self.logger.info("saving cca")
+        np.save(filepath + "n_components.npy" , self.n_components)
+        np.save(filepath + "reg_param.npy", self.reg_param)
+        np.save(filepath + "h_1.npy", self.h_1)
+        np.save(filepath + "h_2.npy", self.h_2)
+        np.save(filepath + "h_3.npy", self.h_3)
+        np.save(filepath + "eigvals.npy", self.eigvals)
+        np.save(filepath + "c11.npy", self.c11)
+        np.save(filepath + "c22.npy", self.c22)
+        np.save(filepath + "c33.npy", self.c33)
+        np.save(filepath + "c12.npy", self.c12)
+        np.save(filepath + "c23.npy", self.c23)
+        np.save(filepath + "c13.npy", self.c13)
+
+    def load_params(self, filepath):
+        self.logger.info("loading cca")
+        self.n_components = np.load(filepath + "n_components.npy")
+        self.reg_param = np.load(filepath + "reg_param.npy")
+        self.h_1 = np.load(filepath + "h_1.npy")
+        self.h_2 = np.load(filepath + "h_2.npy")
+        self.h_3 = np.load(filepath + "h_3.npy")
+        self.eigvals = np.load(filepath + "eigvals.npy")
+        self.c11 = np.load(filepath + "c11.npy")
+        self.c22 = np.load(filepath + "c22.npy")
+        self.c33 = np.load(filepath + "c33.npy")
+        self.c12 = np.load(filepath + "c12.npy")
+        self.c23 = np.load(filepath + "c23.npy")
+        self.c13 = np.load(filepath + "c13.npy")
 
     def normalize(self, mat):
         m = np.mean(mat, axis=0)

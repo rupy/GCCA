@@ -65,49 +65,51 @@ class GCCA:
 
         self.logger.info("calculating average, variance, and covariance")
 
-        z = np.vstack((x_1, x_2, x_3))
+        z = np.vstack((x_1.T, x_2.T, x_3.T))
+        print z.shape
         cov = np.cov(z)
         d1 = len(x_1.T)
         d2 = len(x_2.T) + d1
+        print d1, d2
         c11 = cov[:d1, :d1]
         c22 = cov[d1:d2, d1:d2]
         c33 = cov[d2:, d2:]
         c12 = cov[:d1, d1:d2]
         c23 = cov[d1:d2, d2:]
         c13 = cov[:d1, d2:]
+        # print c11.shape
+        # print c22.shape
+        # print c33.shape
+        # print c12.shape
+        # print c23.shape
+        # print c13.shape
 
         self.logger.info("calculating generalized eigenvalue problem ( A*u = (lambda)*B*u )")
         self.logger.info("adding regularization term")
         c11 += self.reg_param * np.average(np.diag(c11)) * np.eye(c11.shape[0])
-        c22 += self.reg_param * np.average(np.diag(c22)) * np.eye(c12.shape[0])
+        c22 += self.reg_param * np.average(np.diag(c22)) * np.eye(c22.shape[0])
         c33 += self.reg_param * np.average(np.diag(c33)) * np.eye(c33.shape[0])
-        c12 += self.reg_param * np.average(np.diag(c12)) * np.eye(c12.shape[0])
-        c23 += self.reg_param * np.average(np.diag(c23)) * np.eye(c23.shape[0])
-        c13 += self.reg_param * np.average(np.diag(c13)) * np.eye(c13.shape[0])
 
         # left = A, right = B
-        # 1
         self.logger.info("solving")
-        left_1 = 0.5 * (c12 + c13)
-        right_1 = c11
-        eigvals_1, eigvecs_1 = self.solve_eigprob(left_1, right_1)
+        left = 0.5 * np.vstack([
+            np.hstack([np.zeros_like(c11), c12, c13]),
+            np.hstack([c12.T, np.zeros_like(c22), c23]),
+            np.hstack([c13.T, c23.T, np.zeros_like(c33)])
+        ])
+        right = np.vstack([
+            np.hstack([c11, np.zeros_like(c12), np.zeros_like(c13)]),
+            np.hstack([np.zeros_like(c12.T), c22, np.zeros_like(c23)]),
+            np.hstack([np.zeros_like(c13.T), np.zeros_like(c23.T), c33])
+        ])
+        eigvals, eigvecs = self.solve_eigprob(left, right)
 
-        # 2
-        left_2 = 0.5 * (c12.T + c23)
-        right_2 = c22
-        eigvals_2, eigvecs_2 = self.solve_eigprob(left_2, right_2)
-
-        # 3
-        left_3 = 0.5 * (c13.T + c23.T)
-        right_3 = c33
-        eigvals_3, eigvecs_3 = self.solve_eigprob(left_3, right_3)
-
-        self.weights_1 = eigvecs_1
-        self.eigvals_1 = eigvals_1
-        self.weights_2 = eigvecs_2
-        self.eigvals_2 = eigvals_2
-        self.weights_3 = eigvecs_3
-        self.eigvals_3 = eigvals_3
+        self.weights_1 = eigvecs[:d1]
+        self.eigvals_1 = eigvals[:d1]
+        self.weights_2 = eigvecs[d1:d2]
+        self.eigvals_2 = eigvals[d1:d2]
+        self.weights_3 = eigvecs[d2:]
+        self.eigvals_3 = eigvals[d2:]
 
     def transform(self, x_1, x_2, x_3):
 
@@ -132,4 +134,5 @@ class GCCA:
         mat = mat - m
         return mat
 
-
+if __name__=="__main__":
+    pass

@@ -8,7 +8,7 @@ from scipy.linalg import eig
 import logging
 import os
 import sys
-
+import matplotlib.pyplot as plt
 
 class GCCA:
 
@@ -19,11 +19,16 @@ class GCCA:
         self.logger = logging.getLogger(program)
         logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s')
 
+        # GCCA params
         self.n_components = n_components
         self.reg_param = reg_param
+
+        # data
         self.x_1 = None
         self.x_2 = None
         self.x_3 = None
+
+        # Result of fitting
         self.c11 = None
         self.c22 = None
         self.c33 = None
@@ -69,7 +74,6 @@ class GCCA:
         self.x_3 = x_3
 
         self.logger.info("calculating average, variance, and covariance")
-
         z = np.vstack((x_1.T, x_2.T, x_3.T))
         print z.shape
         cov = np.cov(z)
@@ -109,6 +113,7 @@ class GCCA:
         ])
         eigvals, eigvecs = self.solve_eigprob(left, right)
 
+        # substitute local variables for member variables
         self.h_1 = eigvecs[:d1]
         self.h_2 = eigvecs[d1:d2]
         self.h_3 = eigvecs[d2:]
@@ -127,7 +132,7 @@ class GCCA:
         x_2 = self.normalize(x_2)
         x_3 = self.normalize(x_3)
 
-        self.logger.info("transform matrices by CCA")
+        self.logger.info("transform matrices by GCCA")
         z_1 = np.dot(x_1, self.h_1)
         z_2 = np.dot(x_2, self.h_2)
         z_3 = np.dot(x_3, self.h_3)
@@ -138,8 +143,12 @@ class GCCA:
 
         return z_1, z_2, z_3
 
+    def fit_transform(self, x_1, x_2, x_3):
+        self.fit(x_1, x_2, x_3)
+        self.transform(x_1, x_2, x_3)
+
     def save_params(self, filepath):
-        self.logger.info("saving cca")
+        self.logger.info("saving gcca")
         np.save(filepath + "n_components.npy" , self.n_components)
         np.save(filepath + "reg_param.npy", self.reg_param)
         np.save(filepath + "h_1.npy", self.h_1)
@@ -154,7 +163,7 @@ class GCCA:
         np.save(filepath + "c13.npy", self.c13)
 
     def load_params(self, filepath):
-        self.logger.info("loading cca")
+        self.logger.info("loading gcca")
         self.n_components = np.load(filepath + "n_components.npy")
         self.reg_param = np.load(filepath + "reg_param.npy")
         self.h_1 = np.load(filepath + "h_1.npy")
@@ -172,6 +181,33 @@ class GCCA:
         m = np.mean(mat, axis=0)
         mat = mat - m
         return mat
+
+    def plot_gcca_result(self):
+
+        # begin plot
+        plt.figure()
+
+        plt.subplot(221)
+        plt.plot(self.z_1[:, 0], self.z_1[:, 1], '.r')
+        plt.title('GCCA Z1(English)')
+
+        plt.subplot(222)
+        plt.plot(self.z_2[:, 0], self.z_2[:, 1], '.g')
+        plt.title('GCCA Z2(Image)')
+
+        plt.subplot(223)
+        plt.plot(self.z_3[:, 0], self.z_1[:, 1], '.b')
+        plt.title('GCCA Z3(Japanese)')
+
+        plt.subplot(224)
+        plt.plot(self.z_1[:, 0], self.z_1[:, 1], '.r')
+        plt.plot(self.z_2[:, 0], self.z_2[:, 1], '.g')
+        plt.plot(self.z_3[:, 0], self.z_1[:, 1], '.b')
+        plt.title('GCCA Z123(ALL)')
+
+        plt.show()
+
+
 
 if __name__=="__main__":
     pass

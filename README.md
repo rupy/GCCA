@@ -9,7 +9,7 @@ GCCA is the method to transform 2 data to one joint space. See example graph:
 
 ![CCA Plot Result](https://github.com/rupy/GCCA/blob/master/img/cca_plot.png)
 
-CCA inplementation contains PCCA transform that is assumed that there is latent space in 2 data.
+CCA inplementation contains PCCA (Probablistic Canonical Correlation Analysis) transform that is assumed that there is latent space in 2 data.
 
 ## GCCA
 

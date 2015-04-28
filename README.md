@@ -34,7 +34,7 @@ matplotlib==1.4.2
 h5py==2.4.0
 ```
 
-### Usage of CCA
+## Usage of CCA
 
 ```python
 from cca import CCA

@@ -148,3 +148,5 @@ if __name__=="__main__":
     cca.load_params("save/cca.h5")
     # plot
     cca.plot_pcca_result()
+    # calc correlations
+    cca.calc_correlations()

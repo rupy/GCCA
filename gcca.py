@@ -219,6 +219,13 @@ class GCCA:
 
         plt.show()
 
+    def calc_correlations(self):
+        for i, z_i in enumerate(self.z_list):
+            for j, z_j in enumerate(self.z_list):
+                if i < j:
+                   print "(%d, %d): %f" % (i, j, np.corrcoef(z_i[:,0], z_j[:,0])[0, 1])
+
+
 if __name__=="__main__":
 
 
@@ -250,3 +257,5 @@ if __name__=="__main__":
     gcca.load_params("save/gcca.h5")
     # plot
     gcca.plot_gcca_result()
+    # calc correlations
+    gcca.calc_correlations()

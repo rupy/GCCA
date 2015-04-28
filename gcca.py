@@ -222,8 +222,10 @@ class GCCA:
 if __name__=="__main__":
 
 
+    # set log level
     logging.root.setLevel(level=logging.INFO)
 
+    # create data in advance
     a = np.random.rand(50, 50)
     b = np.random.rand(50, 60)
     c = np.random.rand(50, 70)
@@ -236,9 +238,15 @@ if __name__=="__main__":
     j = np.random.rand(50, 140)
     k = np.random.rand(50, 150)
 
+    # create instance of GCCA
     gcca = GCCA()
+    # calculate GCCA
     gcca.fit(a, b, c, d, e, f, g, h, i, j, k)
-    gcca.save_params("save/gcca.h5")
-    gcca.load_params("save/gcca.h5")
+    # transform
     gcca.transform(a, b, c, d, e, f, g, h, i, j, k)
+    # save
+    gcca.save_params("save/gcca.h5")
+    # load
+    gcca.load_params("save/gcca.h5")
+    # plot
     gcca.plot_gcca_result()

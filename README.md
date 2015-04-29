@@ -5,11 +5,11 @@ CCA can use only 2 data but GCCA can use more than 2 data.
 
 ## CCA
 
-GCCA is the method to transform 2 data to one joint space. See example graph:
+CCA is the method to transform 2 data to one joint space. See example graph:
 
 ![CCA Plot Result](https://github.com/rupy/GCCA/blob/master/img/cca_plot.png)
 
-CCA inplementation contains PCCA (Probablistic Canonical Correlation Analysis) transform that is assumed that there is latent space in 2 data.
+CCA inplementation contains PCCA (Probablistic Canonical Correlation Analysis) transformation that is assumed that there is latent space in 2 data.
 
 ## GCCA
 
@@ -25,7 +25,7 @@ You can use 'git clone' command to install
 
 ## Dependencies
 
-You have to install python dependent libraries as follow:
+You have to install python dependent libraries in advance as follow:
 
 ```
 numpy==1.9.1
@@ -102,3 +102,4 @@ gcca.load_params("save/gcca.h5")
 gcca.plot_gcca_result()
 ```
 
+That's it!

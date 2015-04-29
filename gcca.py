@@ -70,6 +70,12 @@ class GCCA:
                 j_start, j_end = d_list[j], d_list[j + 1]
                 cov_mat[i][j] = cov[i_start:i_end, j_start:j_end]
 
+        return cov_mat
+
+    def add_regularization_term(self, cov_mat):
+
+        data_num = len(cov_mat)
+
         # regularization
         self.logger.info("adding regularization term")
         for i in xrange(data_num):
@@ -90,6 +96,7 @@ class GCCA:
 
         d_list = [0] + [sum([len(x.T) for x in x_list][:i + 1]) for i in xrange(data_num)]
         cov_mat = self.calc_cov_mat(x_norm_list)
+        cov_mat = self.add_regularization_term(cov_mat)
 
         self.logger.info("calculating generalized eigenvalue problem ( A*u = (lambda)*B*u )")
         # left = A, right = B

@@ -39,6 +39,7 @@ class CCA(GCCA):
 
         d_list = [0] + [sum([len(x.T) for x in x_list][:i + 1]) for i in xrange(data_num)]
         cov_mat = self.calc_cov_mat(x_norm_list)
+        cov_mat = self.add_regularization_term(cov_mat)
         c_00 = cov_mat[0][0]
         c_01 = cov_mat[0][1]
         c_11 = cov_mat[1][1]

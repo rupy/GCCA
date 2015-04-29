@@ -38,6 +38,8 @@ h5py==2.4.0
 
 ```python
 from cca import CCA
+import logging
+import numpy as np
 
 # set log level
 logging.root.setLevel(level=logging.INFO)

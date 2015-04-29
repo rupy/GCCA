@@ -69,6 +69,8 @@ cca.plot_pcca_result()
 
 ```python
 from gcca import GCCA
+import logging
+import numpy as np
 
 # set log level
 logging.root.setLevel(level=logging.INFO)

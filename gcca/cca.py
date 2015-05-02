@@ -8,7 +8,6 @@ import numpy as np
 import logging
 import os
 import matplotlib.pyplot as plt
-import math
 from matplotlib import colors
 import h5py
 
@@ -97,12 +96,10 @@ class CCA(GCCA):
             if "z_p" in f:
                 self.z_p = f["z_p"].value
             f.flush()
-    def plot_cca_result(self):
-        self.plot_gcca_result()
 
-    def plot_pcca_result(self):
+    def plot_result(self):
 
-        self.logger.info("plotting gcca result")
+        self.logger.info("plotting result")
         row_num = 2
         col_num = 2
 
@@ -112,7 +109,7 @@ class CCA(GCCA):
         color_list = colors.cnames.keys()
         plt.subplot(row_num, col_num, 1)
         plt.plot(self.z_list[0][:, 0], self.z_list[0][:, 1], c=color_list[0], marker='.', ls=' ')
-        plt.title('Z_0(CCA)')
+        plt.title("Z_0(CCA)")
         plt.subplot(row_num, col_num, 2)
         plt.plot(self.z_list[1][:, 0], self.z_list[1][:, 1], c=color_list[1], marker='.', ls=' ')
         plt.title('Z_1(CCA)')
@@ -122,14 +119,14 @@ class CCA(GCCA):
         plt.plot(self.z_list[1][:, 0], self.z_list[1][:, 1], c=color_list[1], marker='.', ls=' ')
         plt.title('Z_ALL(CCA)')
 
-        plt.subplot(row_num, col_num, 4)
-        plt.plot(self.z_p[:, 0], self.z_p[:, 1], c=color_list[2], marker='.', ls=' ')
-        plt.title('Z(PCCA)')
+        if len(self.z_p) != 0:
+            plt.subplot(row_num, col_num, 4)
+            plt.plot(self.z_p[:, 0], self.z_p[:, 1], c=color_list[2], marker='.', ls=' ')
+            plt.title('Z(PCCA)')
 
         plt.show()
-
-if __name__=="__main__":
-
+        
+def main():
 
     # set log level
     logging.root.setLevel(level=logging.INFO)
@@ -151,6 +148,10 @@ if __name__=="__main__":
     # load
     cca.load_params("save/cca.h5")
     # plot
-    cca.plot_pcca_result()
+    cca.plot_result()
     # calc correlations
     cca.calc_correlations()
+
+if __name__=="__main__":
+
+    main()

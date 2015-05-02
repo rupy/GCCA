@@ -5,13 +5,7 @@ __author__ = 'rupy'
 
 from gcca import GCCA
 import numpy as np
-from scipy.linalg import eig
 import logging
-import os
-import matplotlib.pyplot as plt
-import math
-from matplotlib import colors
-import h5py
 from sklearn.datasets import load_digits
 
 class BridgedCCA(GCCA):
@@ -94,9 +88,7 @@ class BridgedCCA(GCCA):
         self.h_list = h_list_norm
         self.eigvals = eigvals
 
-
-if __name__=="__main__":
-
+def main():
 
     # set log level
     logging.root.setLevel(level=logging.INFO)
@@ -123,4 +115,8 @@ if __name__=="__main__":
     # calc correlations
     bcca.calc_correlations()
     # plot
-    bcca.plot_gcca_result()
+    bcca.plot_result()
+
+if __name__=="__main__":
+
+    main()

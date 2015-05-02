@@ -162,7 +162,7 @@ class GCCA:
 
     def save_params(self, filepath):
 
-        self.logger.info("saving gcca to %s", filepath)
+        self.logger.info("saving to %s", filepath)
         with h5py.File(filepath, 'w') as f:
             f.create_dataset("n_components", data=self.n_components)
             f.create_dataset("reg_param", data=self.reg_param)
@@ -186,7 +186,7 @@ class GCCA:
             f.flush()
 
     def load_params(self, filepath):
-        self.logger.info("loading gcca from %s", filepath)
+        self.logger.info("loading from %s", filepath)
         with h5py.File(filepath, "r") as f:
             self.n_components = f["n_components"].value
             self.reg_param = f["reg_param"].value
@@ -207,9 +207,9 @@ class GCCA:
                     self.z_list[i] = f["z_list/" + str(i)].value
             f.flush()
 
-    def plot_gcca_result(self):
+    def plot_result(self):
 
-        self.logger.info("plotting gcca result")
+        self.logger.info("plotting result")
         col_num = int(math.ceil(math.sqrt(self.data_num + 1)))
         row_num = int((self.data_num + 1) / float(col_num))
         if row_num != (self.data_num + 1) / float(col_num):
@@ -238,9 +238,7 @@ class GCCA:
                 if i < j:
                    print "(%d, %d): %f" % (i, j, np.corrcoef(z_i[:,0], z_j[:,0])[0, 1])
 
-
-if __name__=="__main__":
-
+def main():
 
     # set log level
     logging.root.setLevel(level=logging.INFO)
@@ -259,7 +257,7 @@ if __name__=="__main__":
     k = np.random.rand(50, 150)
 
     # create instance of GCCA
-    gcca = GCCA()
+    gcca = GCCA(reg_param=0.01)
     # calculate GCCA
     gcca.fit(a, b, c, d, e, f, g, h, i, j, k)
     # transform
@@ -269,6 +267,9 @@ if __name__=="__main__":
     # load
     gcca.load_params("save/gcca.h5")
     # plot
-    gcca.plot_gcca_result()
+    gcca.plot_result()
     # calc correlations
     gcca.calc_correlations()
+
+if __name__=="__main__":
+    main()

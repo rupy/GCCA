@@ -84,6 +84,14 @@ class HierarchicalCCA(GCCA):
             f.create_dataset("eig_vals1", data=self.cca1.eigvals)
             f.create_dataset("eig_vals2", data=self.cca2.eigvals)
 
+            mean_grp1 = f.create_group("mean_list1")
+            for i, m in enumerate(self.cca1.mean_list):
+                mean_grp1.create_dataset(str(i), data=m)
+
+            mean_grp2 = f.create_group("mean_list2")
+            for i, m in enumerate(self.cca2.mean_list):
+                mean_grp2.create_dataset(str(i), data=m)
+
             if len(self.cca1.z_list) != 0:
                 z_grp1 = f.create_group("z_list1")
                 for i, z in enumerate(self.z_list):
@@ -132,6 +140,13 @@ class HierarchicalCCA(GCCA):
                 self.cca2.h_list[i] = f["h_list2/" + str(i)].value
             self.cca1.eig_vals = f["eig_vals1"].value
             self.cca2.eig_vals = f["eig_vals2"].value
+
+            self.cca1.mean_list = [None] * self.data_num
+            for i in xrange(self.cca1.data_num):
+                self.cca1.mean_list[i] = f["mean_list1/" + str(i)].value
+            self.cca2.mean_list = [None] * self.data_num
+            for i in xrange(self.cca2.data_num):
+                self.cca2.mean_list[i] = f["mean_list2/" + str(i)].value
 
             if "z_list1" in f:
                 self.cca1.z_list = [None] * self.cca2.data_num

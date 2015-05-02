@@ -34,7 +34,10 @@ class CCA(GCCA):
             self.logger.info("data shape x_%d: %s", i, x.shape)
 
         self.logger.info("normalizing")
-        x_norm_list = [ self.normalize(x) for x in x_list]
+        # calc mean
+        mean_list = [np.mean(x, axis=0) for x in x_list]
+        # normalize
+        x_norm_list = [ x - m for x, m in zip(x_list, mean_list)]
 
         d_list = [0] + [sum([len(x.T) for x in x_list][:i + 1]) for i in xrange(data_num)]
         cov_mat = self.calc_cov_mat(x_norm_list)
@@ -60,6 +63,7 @@ class CCA(GCCA):
         self.cov_mat = cov_mat
         self.h_list = [eigvecs_1_norm, eigvecs_2_norm]
         self.eigvals = eigvals_1
+        self.mean_list = mean_list
 
     def ptransform(self, x0, x1, beta=0.5):
 
@@ -126,10 +130,13 @@ class CCA(GCCA):
 
         plt.show()
         
+
 def main():
 
     # set log level
     logging.root.setLevel(level=logging.INFO)
+
+    np.random.seed(0)
 
     # create data in advance
     a = np.random.rand(50, 50)

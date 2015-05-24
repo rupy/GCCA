@@ -65,7 +65,10 @@ class GCCA:
 
         self.logger.info("calc variance & covariance matrix")
         z = np.vstack([x.T for x in x_list])
-        cov = np.cov(z)
+        if z.shape[1] != 0:
+            cov = np.cov(z)
+        else:
+            cov = np.zeros((z.shape[0], z.shape[0]))
         d_list = [0] + [sum([len(x.T) for x in x_list][:i + 1]) for i in xrange(data_num)]
         cov_mat = [[np.array([]) for col in range(data_num)] for row in range(data_num)]
         for i in xrange(data_num):
@@ -230,12 +233,12 @@ class GCCA:
         for i in xrange(self.data_num):
 
             plt.subplot(row_num, col_num, i + 1)
-            plt.plot(self.z_list[i][:, 0], self.z_list[i][:, 1], c=color_list[i], marker='.', ls='-')
+            plt.plot(self.z_list[i][:, 0], self.z_list[i][:, 1], c=color_list[i], marker='.', ls=' ')
             plt.title("Z_%d(GCCA)" % (i + 1))
 
         plt.subplot(row_num, col_num, self.data_num + 1)
         for i in xrange(self.data_num):
-            plt.plot(self.z_list[i][:, 0], self.z_list[i][:, 1], c=color_list[i], marker='.', ls='-')
+            plt.plot(self.z_list[i][:, 0], self.z_list[i][:, 1], c=color_list[i], marker='.', ls=' ')
             plt.title("Z_ALL(GCCA)")
 
         plt.show()
@@ -245,6 +248,16 @@ class GCCA:
             for j, z_j in enumerate(self.z_list):
                 if i < j:
                    print "(%d, %d): %f" % (i, j, np.corrcoef(z_i[:,0], z_j[:,0])[0, 1])
+
+    def get_correlations(self):
+        pair_list = []
+        cor_list = []
+        for i, z_i in enumerate(self.z_list):
+            for j, z_j in enumerate(self.z_list):
+                if i < j:
+                    cor_list.append(np.corrcoef(z_i[:,0], z_j[:,0])[0, 1])
+                    pair_list.append([i, j])
+        return pair_list, cor_list
 
     @staticmethod
     def normalize(mat):
@@ -273,9 +286,9 @@ def main():
     # create instance of GCCA
     gcca = GCCA(reg_param=0.01)
     # calculate GCCA
-    gcca.fit(a, b, c, d, e, f, g, h, i, j, k)
+    gcca.fit(a, b, c)
     # transform
-    gcca.transform(a, b, c, d, e, f, g, h, i, j, k)
+    gcca.transform(a, b, c)
     # save
     gcca.save_params("save/gcca.h5")
     # load

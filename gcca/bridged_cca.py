@@ -7,6 +7,9 @@ from gcca import GCCA
 import numpy as np
 import logging
 from sklearn.datasets import load_digits
+from sklearn.datasets import load_boston
+
+import matplotlib.pyplot as plt
 
 class BridgedCCA(GCCA):
 
@@ -56,10 +59,7 @@ class BridgedCCA(GCCA):
         c11 = var_mat_list[1]
         c12 = cov_mat_list12[0][1]
         c22 = var_mat_list[2]
-        if x0_pair2.shape[0] == 0 or x1_pair2.shape[0] == 0 or x2_pair2.shape[0] == 0:
-            c02 = np.zeros((c00.shape[0], c22.shape[1]))
-        else:
-            c02 = cov_mat_list02[0][1]
+        c02 = cov_mat_list02[0][1]
 
         cov_mat = [[np.array([]) for col in range(data_num)] for row in range(data_num)]
         cov_mat[0][0], cov_mat[0][1], cov_mat[0][2] = c00, c01, c02
@@ -120,22 +120,33 @@ def main():
 
     # create instance of BridgedCCA
     bcca = BridgedCCA(reg_param=0.001)
+
+    cor_results = []
     # calculate BridgedCCA
-    sep0 = 500
-    sep1 = 1000
-    sep2 = 1000
-    bcca.fit(a[:sep0], b[:sep0], b[sep0:sep1], c[sep0:sep1], a[sep1:sep2], b[sep1:sep2], c[sep1:sep2])
-    # transform
-    sep3 = sep2
-    bcca.transform(a[:sep3], b[:sep3], c[:sep3])
-    # save
-    bcca.save_params("save/bcca.h5")
-    # load
-    bcca.load_params("save/bcca.h5")
-    # calc correlations
-    bcca.calc_correlations()
-    # plot
-    bcca.plot_result()
+    for i in xrange(0, 1000, 50):
+        sep1 = i
+        sep0 = sep1/2
+        sep2 = 1000
+        bcca.fit(a[:sep0], b[:sep0], b[sep0:sep1], c[sep0:sep1], a[sep1:sep2], b[sep1:sep2], c[sep1:sep2])
+        # transform
+        sep3 = sep2
+        bcca.transform(a[:sep3], b[:sep3], c[:sep3])
+        # # save
+        # bcca.save_params("save/bcca.h5")
+        # # load
+        # bcca.load_params("save/bcca.h5")
+        # calc correlations
+        pair_list, cor_list = bcca.get_correlations()
+        cor_results.append(cor_list)
+        # # plot
+        # bcca.plot_result()
+
+    try__num = len(cor_results)
+    cor_mat = np.array(cor_results)
+    plt.plot(range(0, 1000, 50), cor_mat[:, 0],"r-")
+    plt.plot(range(0, 1000, 50), cor_mat[:, 1], "g-")
+    plt.plot(range(0, 1000, 50), cor_mat[:, 2], "b-")
+    plt.show()
 
 if __name__=="__main__":
 

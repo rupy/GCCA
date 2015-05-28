@@ -16,22 +16,28 @@ class BridgedCCA(GCCA):
     def __init__(self, n_components=2, reg_param=0.1):
         GCCA.__init__(self, n_components, reg_param)
 
-    def fit(self, x0_pair0, x1_pair0, x1_pair1, x2_pair1, x0_pair2, x1_pair2, x2_pair2):
+    def fit(self, x0_pair0, x1_pair0, x1_pair1, x2_pair1, x0_pair2, x2_pair2):
 
         data_num = 3
 
         # get list of each modality data (for calculation of variances)
         x0_list = [x0_pair0, x0_pair2]
-        x1_list = [x1_pair0, x1_pair1, x1_pair2]
+        x1_list = [x1_pair0, x1_pair1]
         x2_list = [x2_pair1, x2_pair2]
         x0_all = np.vstack(x0_list)
         x1_all = np.vstack(x1_list)
         x2_all = np.vstack(x2_list)
         all_list = [x0_all, x1_all, x2_all]
+        if x0_all.shape[0] == 0:
+            raise Exception("x0 has No rows")
+        elif x1_all.shape[0] == 0:
+            raise Exception("x1 has No rows")
+        elif x2_all.shape[0] == 0:
+            raise Exception("x2 has No rows")
 
         # get list of each pair (for calculation of covariances)
-        list01 = [np.vstack([x0_pair0, x0_pair2]), np.vstack([x1_pair0, x1_pair2])]
-        list12 = [np.vstack([x1_pair1, x1_pair2]), np.vstack([x2_pair1, x2_pair2])]
+        list01 = [x0_pair0, x1_pair0]
+        list12 = [x1_pair1, x2_pair1]
         list02 = [x0_pair2, x2_pair2]
 
         self.logger.info("normalizing")
@@ -122,12 +128,13 @@ def main():
     bcca = BridgedCCA(reg_param=0.001)
 
     cor_results = []
+    sample_num = range(10, 1000, 10)
     # calculate BridgedCCA
-    for i in xrange(0, 1000, 50):
+    for i in sample_num:
         sep1 = i
         sep0 = sep1/2
         sep2 = 1000
-        bcca.fit(a[:sep0], b[:sep0], b[sep0:sep1], c[sep0:sep1], a[sep1:sep2], b[sep1:sep2], c[sep1:sep2])
+        bcca.fit(a[:sep0], b[:sep0], b[sep0:sep1], c[sep0:sep1], a[sep1:sep2], c[sep1:sep2])
         # transform
         sep3 = sep2
         bcca.transform(a[:sep3], b[:sep3], c[:sep3])
@@ -143,9 +150,9 @@ def main():
 
     try__num = len(cor_results)
     cor_mat = np.array(cor_results)
-    plt.plot(range(0, 1000, 50), cor_mat[:, 0],"r-")
-    plt.plot(range(0, 1000, 50), cor_mat[:, 1], "g-")
-    plt.plot(range(0, 1000, 50), cor_mat[:, 2], "b-")
+    plt.plot(sample_num, cor_mat[:, 0],"r-")
+    plt.plot(sample_num, cor_mat[:, 1], "g-")
+    plt.plot(sample_num, cor_mat[:, 2], "b-")
     plt.show()
 
 if __name__=="__main__":
